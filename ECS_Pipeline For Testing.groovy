@@ -7,7 +7,7 @@ pipeline {
         string(name: 'Version_Number',description: 'Enter the Version Number')
         string(name: 'Region_Name',description: 'Enter the Region Name')
         string(name: 'Aws_Id' ,description: 'Enter the AWS Id')
-        string(name: 'Workspace_name',description: 'Enter the Workspace name')
+        string(name: 'Workspace_name',defaultValue: 'ECS_Pipeline For Testing',description: 'Enter the Workspace name')
         string(name: 'AWS_Credentials_Id',description: 'Enter the AWS Credentials Id')
         string(name: 'Git_Credentials_Id',description: 'Enter the Git Credentials Id')
         string(name: 'ECR_Credentials',description: 'Enter the ECR Credentials')
