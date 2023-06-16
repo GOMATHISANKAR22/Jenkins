@@ -6,7 +6,7 @@ pipeline {
         string(name: 'ECR_Repo_Name', defaultValue: 'test',description: 'Enter the ECR Repositary Name') 
         string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image')
         choice  (choices: ["us-east-1", "us-east-2",],
-                 description: 'Select your Region Name (eg: us-east-1). To Know your region code refer https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions ',
+                 description: 'Select your Region Name (eg: us-east-1). To Know your region code refer "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions" ',
                  name: 'Region_Name')      
         
         string(name: 'Aws_Id' ,description: 'Enter the AWS Id')
