@@ -22,6 +22,7 @@ pipeline {
     environment {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
         S3_Url          = 'https://yamlclusterecs.s3.amazonaws.com/master.yaml'
+        S3_Url_Prod     = 'https://s3.yaml'
     }
     stages {
         stage('Clone the Git Repository') {
@@ -213,13 +214,13 @@ pipeline {
                     if (stackExists == 0) {
                         script {
                             sh '''
-                            aws cloudformation update-stack --stack-name ${Prod_Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} || true
+                            aws cloudformation update-stack --stack-name ${Prod_Stack_Name} --template-url ${S3_Url_Prod} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} || true
                             '''
                         }
                     } else {
                         script {
                             sh '''
-                            aws cloudformation create-stack --stack-name ${Prod_Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
+                            aws cloudformation create-stack --stack-name ${Prod_Stack_Name} --template-url ${S3_Url_Prod} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
                             '''
                         }
                     }
