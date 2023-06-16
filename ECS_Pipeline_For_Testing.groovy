@@ -139,6 +139,23 @@ pipeline {
                 }
             }
         } }
+        stage('Wait for Stack Update') {
+            steps {
+                withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                credentialsId: "${AWS_Credentials_Id}",
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
+                script {
+                   def stackStatus = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].StackStatus' --output text").trim()
+                    while (stackStatus.contains('UPDATE_IN_PROGRESS')) {
+                        echo "Waiting for the stack ${Stack_Name}  update to complete..."
+                        sleep 30 
+                        stackStatus = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].StackStatus' --output text").trim()
+                    }
+                }
+            }
+        }
         stage('Approval for stack creation') {
             steps {
                 timeout(time: 900, unit: 'MINUTES') {
