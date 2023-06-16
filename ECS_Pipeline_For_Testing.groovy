@@ -198,7 +198,7 @@ pipeline {
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']],
                     from: "${fromMailId}",
-                    to: "${MailToRecipients}"
+                    to: "${MailToRecipients}",
                     attachLog: true
                 )
             }
