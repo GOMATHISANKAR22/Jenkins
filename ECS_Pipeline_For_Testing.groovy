@@ -3,6 +3,7 @@ pipeline {
     parameters {
         string(name: 'Git_Hub_URL', description: 'Enter the GitHub URL')
         string(name: 'AWS_Account_Id' ,description: 'Enter the AWS Account Id')
+        string(name: 'fromMailId' ,description: 'Enter the Email from address ')
         string(name: 'MailToRecipients' ,description: 'Enter the Mail Id for Approval')
         string(name: 'Endpoint_URL' ,description: 'Enter the Endpoint URL for OWASP Analysis')
         choice  (choices: ["us-east-1","us-east-2","us-west-1","us-west-2","ap-south-1","ap-northeast-3","ap-northeast-2","ap-southeast-1","ap-southeast-2","ap-northeast-1","ca-central-1","eu-central-1","eu-west-1","eu-west-2","eu-west-3","eu-north-1","sa-east-1"],
@@ -68,6 +69,7 @@ pipeline {
                     body: "SonarQube Analysis Report URL: http://${Jenkins_IP}:9000/dashboard?id=${SONAR_PROJECT_NAME} \n Username: admin /n Password: 12345 \n Please Approve to Build the Docker Image in Testing Environment\n\n${BUILD_URL}input/",
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+                    from: "${fromMailId}",
                     to: "${MailToRecipients}",              
                 )
             }
@@ -195,7 +197,8 @@ pipeline {
                     body: '${FILE,path="report.html"} \n Application Successfully Deployed in AWS ECS and Verify the OWASP Report\n\n${BUILD_URL}input/',
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']],
-                    to: "${MailToRecipients}",
+                    from: "${fromMailId}",
+                    to: "${MailToRecipients}"
                     attachLog: true
                 )
             }
