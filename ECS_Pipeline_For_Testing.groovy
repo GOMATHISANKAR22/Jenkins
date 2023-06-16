@@ -13,7 +13,7 @@ pipeline {
         string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image (Default: 1.0)')
         string(name: 'Workspace_name',defaultValue: 'ECS_Pipeline_For_Testing',description: 'Workspace name')      
         string(name: 'AWS_Credentials_Id',defaultValue: 'AWS_Credentials', description: 'AWS Credentials Id')
-        string(name: 'Git_Credentials_Id',deafultValue: 'Github_Credentials',description: 'Git Credentials Id')
+        string(name: 'Git_Credentials_Id',defaultValue: 'Github_Credentials',description: 'Git Credentials Id')
         string(name: 'Stack_Name', defaultValue: 'ECS' ,description: 'Stack Name (Default: ECS')
         string(name: 'SONAR_PROJECT_NAME',defaultValue: 'Demo' ,description: 'Sonar Project Name (Default: Demo')
         choice  (choices: ["Baseline", "Full"],
