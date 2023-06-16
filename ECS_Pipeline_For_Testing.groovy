@@ -3,7 +3,6 @@ pipeline {
     parameters {
         string(name: 'Git_Hub_URL', description: 'Enter the GitHub URL')
         string(name: 'AWS_Account_Id' ,description: 'Enter the AWS Account Id')
-        string(name: 'Jenkins_IP',description: 'Enter the Jenkins IP')
         string(name: 'MailToRecipients' ,description: 'Enter the Mail Id for Approval')
         string(name: 'Endpoint_URL' ,description: 'Enter the Endpoint URL for OWASP Analysis')
         choice  (choices: ["us-east-1","us-east-2","us-west-1","us-west-2","ap-south-1","ap-northeast-3","ap-northeast-2","ap-southeast-1","ap-southeast-2","ap-northeast-1","ca-central-1","eu-central-1","eu-west-1","eu-west-2","eu-west-3","eu-north-1","sa-east-1"],
@@ -36,6 +35,7 @@ pipeline {
                 sudo chmod 666 /var/run/docker.sock
                 docker start sonarqube
                 docker start owasp
+                curl ipinfo.io/ip > ip.txt
                 '''
             }
         }
@@ -58,6 +58,11 @@ pipeline {
         }
         stage('Send Sonar Analysis Report and Approval Email for Build Image') {
             steps {
+                script {
+                    def Jenkins_IP = sh(
+                        returnStdout: true,
+                        script: 'cat ip.txt'
+                    )
                 emailext (
                     subject: "Approval Needed to Build Docker Image",
                     body: "SonarQube Analysis Report URL: http://${Jenkins_IP}:9000/dashboard?id=${SONAR_PROJECT_NAME} \n Username: admin /n Password: 12345 \n Please Approve to Build the Docker Image in Testing Environment\n\n${BUILD_URL}input/",
@@ -67,6 +72,7 @@ pipeline {
                     to: "${MailToRecipients}",              
                 )
             }
+        }
         }
         stage('Approval-Build Image') {
             steps {
@@ -92,7 +98,7 @@ pipeline {
         }
         stage('Build and Push the Docker Image to ECR Repository') {
             steps {
-               withDockerRegistry(credentialsId: "${ECR_Credentials}", url: 'https://${Aws_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
+               withDockerRegistry(credentialsId: "${ECR_Credentials}", url: 'https://${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
             {
                 sh '''
                 docker build -t ${ECR_Repo_Name} .     
