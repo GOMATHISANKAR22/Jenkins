@@ -24,7 +24,7 @@ pipeline {
                  name: 'GENERATE_REPORT')
     }
     environment {
-        ECR_Credentials = "ecr:$Region_Name:AWS_Credentials"
+        ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
         S3_Url          = 'https://yamlclusterecs.s3.amazonaws.com/master.yaml'
     }
     stages {
@@ -42,13 +42,13 @@ pipeline {
                 '''
             }
         }
-        stage('Wait for SonarQube to Start') {
-            steps {
-                script {
-                    sleep 120 
-                }
-            }
-        }
+       // stage('Wait for SonarQube to Start') {
+        //    steps {
+        //        script {
+         //           sleep 120 
+          //      }
+          //  }
+      //  }
         stage('SonarQube Analysis') {
             steps {
             script {
