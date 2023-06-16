@@ -95,7 +95,7 @@ pipeline {
         }
         stage('Build and Push the Docker Image to ECR Repository') {
             steps {
-               withDockerRegistry(credentialsId: "${ECR_Credentials}", url: 'https://${Aws_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
+               withDockerRegistry(credentialsId: "${AWS_Credentials_Id}", url: 'https://${Aws_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
             {
                 sh '''
                 docker build -t ${ECR_Repo_Name} .     
