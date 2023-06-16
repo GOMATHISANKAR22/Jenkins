@@ -146,6 +146,7 @@ pipeline {
                 credentialsId: "${AWS_Credentials_Id}",
                 accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                 secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
+                {
                 script {
                    def stackStatus = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].StackStatus' --output text").trim()
                     while (stackStatus.contains('UPDATE_IN_PROGRESS')) {
@@ -156,12 +157,6 @@ pipeline {
                 }
             }
         }
-        stage('Approval for stack creation') {
-            steps {
-                timeout(time: 900, unit: 'MINUTES') {
-                    input message: 'Please approve the deploy process by clicking the link provided in the email.', ok: 'Proceed'
-                }
-            }
         }
          stage('Scanning target on owasp container') {
              steps {
