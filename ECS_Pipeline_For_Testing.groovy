@@ -6,7 +6,7 @@ pipeline {
         string(name: 'Jenkins_IP',description: 'Enter the Jenkins IP')
         string(name: 'MailToRecipients' ,description: 'Enter the MailID for Approval')
         string(name: 'Endpoint_URL' ,description: 'Enter the Endpoint URL')
-        choice  (choices: ["us-east-1", "us-east-2",],
+        choice  (choices: ["us-east-1","us-east-2","us-west-1","us-west-2","ap-south-1","ap-northeast-3","ap-northeast-2","ap-southeast-1","ap-southeast-2","ap-northeast-1","ca-central-1","eu-central-1","eu-west-1","eu-west-2","eu-west-3","eu-north-1","sa-east-1"],
                  description: 'Select your Region Name (eg: us-east-1). To Know your region code refer URL"https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions" ',
                  name: 'Region_Name')  
         string(name: 'ECR_Repo_Name', defaultValue: 'test',description: 'ECR Repositary (Default: test)') 
@@ -24,7 +24,7 @@ pipeline {
                  name: 'GENERATE_REPORT')
     }
     environment {
-        ECR_Credentials = 'ecr:"${Region_Name}":AWS_Credentials'
+        ECR_Credentials = 'ecr:$Region_Name:AWS_Credentials'
         S3_Url          = 'https://yamlclusterecs.s3.amazonaws.com/master.yaml'
     }
     stages {
@@ -95,7 +95,7 @@ pipeline {
         }
         stage('Build and Push the Docker Image to ECR Repository') {
             steps {
-               withDockerRegistry(credentialsId: "${AWS_Credentials_Id}", url: 'https://${Aws_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
+               withDockerRegistry(credentialsId: "${ECR_Credentials}", url: 'https://${Aws_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
             {
                 sh '''
                 docker build -t ${ECR_Repo_Name} .     
