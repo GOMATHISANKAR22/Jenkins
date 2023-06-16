@@ -24,7 +24,7 @@ pipeline {
                  name: 'GENERATE_REPORT')
     }
     environment {
-        ECR_Credentials = 'ecr:${Region_Name}:AWS_Credentials'
+        ECR_Credentials = 'ecr:"${Region_Name}":AWS_Credentials'
         S3_Url          = 'https://yamlclusterecs.s3.amazonaws.com/master.yaml'
     }
     stages {
