@@ -2,30 +2,30 @@ pipeline {
     agent any
     parameters {
         string(name: 'Git_Hub_URL', description: 'Enter the Git Hub URL')
+        string(name: 'Aws_Id' ,description: 'Enter the AWS Account Id')
         string(name: 'Jenkins_IP',description: 'Enter the Jenkins IP')
-        string(name: 'ECR_Repo_Name', defaultValue: 'test',description: 'Enter the ECR Repositary Name') 
-        string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image')
+        string(name: 'MailToRecipients' ,description: 'Enter the MailID for Approval')
+        string(name: 'Endpoint_URL' ,description: 'Enter the Endpoint URL')
         choice  (choices: ["us-east-1", "us-east-2",],
-                 description: 'Select your Region Name (eg: us-east-1). To Know your region code refer "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions" ',
-                 name: 'Region_Name')      
-        
-        string(name: 'Aws_Id' ,description: 'Enter the AWS Id')
-        string(name: 'Workspace_name',defaultValue: 'ECS_Pipeline_For_Testing',description: 'Enter the Workspace name')
-        string(name: 'AWS_Credentials_Id',description: 'Enter the AWS Credentials Id')
-        string(name: 'Git_Credentials_Id',description: 'Enter the Git Credentials Id')
-        string(name: 'ECR_Credentials',description: 'Enter the ECR Credentials')
-        string(name: 'Stack_Name', defaultValue: 'ECS' ,description: 'Enter the Stack Name')
-        string(name: 'S3_URL', defaultValue: 'https://yamlclusterecs.s3.amazonaws.com/master.yaml',description: 'Enter the S3 URL')
-        string(name: 'SONAR_PROJECT_NAME',defaultValue: 'Demo' ,description: 'Enter the Sonar Project Name')
-        string(name: 'MailToRecipients' ,description: 'Enter the Mail To Recipients')
-        string(name: 'ALBEndpoint_URL' ,description: 'Enter the ALB Endpoint')
-
+                 description: 'Select your Region Name (eg: us-east-1). To Know your region code refer URL"https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions" ',
+                 name: 'Region_Name')  
+        string(name: 'ECR_Repo_Name', defaultValue: 'test',description: 'ECR Repositary (Default: test)') 
+        string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image (Default: 1.0)')
+        string(name: 'Workspace_name',defaultValue: 'ECS_Pipeline_For_Testing',description: 'Workspace name')      
+        string(name: 'AWS_Credentials_Id',defaultValue: 'AWS_Credentials', description: 'AWS Credentials Id')
+        string(name: 'Git_Credentials_Id',deafultValue: 'Github_Credentials',description: 'Git Credentials Id')
+        string(name: 'Stack_Name', defaultValue: 'ECS' ,description: 'Stack Name (Default: ECS')
+        string(name: 'SONAR_PROJECT_NAME',defaultValue: 'Demo' ,description: 'Sonar Project Name (Default: Demo')
         choice  (choices: ["Baseline", "Full"],
                  description: 'Type of scan that is going to perform inside the container',
                  name: 'SCAN_TYPE')
         booleanParam (defaultValue: true,
                  description: 'Parameter to know if wanna generate report.',
                  name: 'GENERATE_REPORT')
+    }
+    environment {
+        ECR_Credentials = 'ecr:${Region_Name}:AWS_Credentials'
+        S3_URL          = 'https://yamlclusterecs.s3.amazonaws.com/master.yaml'
     }
     stages {
         stage('Clone the Git Repository') {
@@ -148,7 +148,7 @@ pipeline {
                  script {
                      scan_type = "${params.SCAN_TYPE}"
                      echo "----> scan_type: $scan_type"
-                     target = "${ALBEndpoint_URL}"
+                     target = "${Endpoint_URL}"
                      if(scan_type == "Baseline"){
                          sh """
                              docker exec owasp zap-baseline.py -t $target -r report.html -I 
