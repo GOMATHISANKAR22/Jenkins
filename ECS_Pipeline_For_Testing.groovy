@@ -1,13 +1,13 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'Git_Hub_URL', description: 'Enter the Git Hub URL')
-        string(name: 'Aws_Id' ,description: 'Enter the AWS Account Id')
+        string(name: 'Git_Hub_URL', description: 'Enter the GitHub URL')
+        string(name: 'AWS_Account_Id' ,description: 'Enter the AWS Account Id')
         string(name: 'Jenkins_IP',description: 'Enter the Jenkins IP')
-        string(name: 'MailToRecipients' ,description: 'Enter the MailID for Approval')
-        string(name: 'Endpoint_URL' ,description: 'Enter the Endpoint URL')
+        string(name: 'MailToRecipients' ,description: 'Enter the MailId for Approval')
+        string(name: 'Endpoint_URL' ,description: 'Enter the Endpoint URL for OWASP Analysis')
         choice  (choices: ["us-east-1","us-east-2","us-west-1","us-west-2","ap-south-1","ap-northeast-3","ap-northeast-2","ap-southeast-1","ap-southeast-2","ap-northeast-1","ca-central-1","eu-central-1","eu-west-1","eu-west-2","eu-west-3","eu-north-1","sa-east-1"],
-                 description: 'Select your Region Name (eg: us-east-1). To Know your region code refer URL"https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions" ',
+                 description: 'Select your Region Name (eg: us-east-1). To Know your region code refer URL "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions" ',
                  name: 'Region_Name')  
         string(name: 'ECR_Repo_Name', defaultValue: 'test',description: 'ECR Repositary (Default: test)') 
         string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image (Default: 1.0)')
@@ -17,11 +17,8 @@ pipeline {
         string(name: 'Stack_Name', defaultValue: 'ECS' ,description: 'Stack Name (Default: ECS)')
         string(name: 'SONAR_PROJECT_NAME',defaultValue: 'Demo' ,description: 'Sonar Project Name (Default: Demo)')
         choice  (choices: ["Baseline", "Full"],
-                 description: 'Type of scan that is going to perform inside the container',
+                 description: 'Type of scan for OWASP Analysis',
                  name: 'SCAN_TYPE')
-        booleanParam (defaultValue: true,
-                 description: 'Parameter to know if wanna generate report.',
-                 name: 'GENERATE_REPORT')
     }
     environment {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
@@ -99,8 +96,8 @@ pipeline {
             {
                 sh '''
                 docker build -t ${ECR_Repo_Name} .     
-                docker tag ${ECR_Repo_Name}:latest ${Aws_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
-                docker push ${Aws_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
+                docker tag ${ECR_Repo_Name}:latest ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
+                docker push ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
                
                 '''
              }
@@ -122,13 +119,13 @@ pipeline {
                     if (stackExists == 0) {
                         script {
                             sh '''
-                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${Aws_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} || true
+                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} || true
                            '''
                         }
                     } else {
                         script {
                             sh '''
-                            aws cloudformation create-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${Aws_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} 
+                            aws cloudformation create-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} 
                             '''
                         }
                     }
