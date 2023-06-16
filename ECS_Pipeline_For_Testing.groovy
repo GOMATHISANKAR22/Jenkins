@@ -5,7 +5,7 @@ pipeline {
         string(name: 'Jenkins_IP',description: 'Enter the Jenkins IP')
         string(name: 'ECR_Repo_Name', defaultValue: 'test',description: 'Enter the ECR Repositary Name') 
         string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image')
-        choice  (choices: ["us-east-1"'(NVirginia)', "us-east-2"'(Ohio)'],
+        choice  (choices: ["us-east-1", "us-east-2"],
                  description: 'Enter your Region Name (eg: us-east-1)',
                  name: 'Region_Name')      
         
