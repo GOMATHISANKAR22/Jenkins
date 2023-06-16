@@ -2,16 +2,19 @@ pipeline {
     agent any
     parameters {
         string(name: 'Git_Hub_URL', description: 'Enter the Git Hub URL')
-        string(name: 'ECR_Repo_Name',description: 'Enter the Image Name') 
         string(name: 'Jenkins_IP',description: 'Enter the Jenkins IP')
-        string(name: 'Version_Number',description: 'Enter the Version Number')
-        string(name: 'Region_Name',description: 'Enter the Region Name')
+        string(name: 'ECR_Repo_Name', defaultValue: 'test',description: 'Enter the ECR Repositary Name') 
+        string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image')
+        choice  (choices: ["us-east-1"(NVirginia), "us-east-2"(Ohio)],
+                 description: 'Enter your Region Name (eg: us-east-1)',
+                 name: 'Region_Name')      
+        
         string(name: 'Aws_Id' ,description: 'Enter the AWS Id')
         string(name: 'Workspace_name',defaultValue: 'ECS_Pipeline_For_Testing',description: 'Enter the Workspace name')
         string(name: 'AWS_Credentials_Id',description: 'Enter the AWS Credentials Id')
         string(name: 'Git_Credentials_Id',description: 'Enter the Git Credentials Id')
         string(name: 'ECR_Credentials',description: 'Enter the ECR Credentials')
-        string(name: 'Stack_Name',description: 'Enter the Stack Name')
+        string(name: 'Stack_Name', defaultValue: 'ECS' ,description: 'Enter the Stack Name')
         string(name: 'S3_URL', defaultValue: 'https://yamlclusterecs.s3.amazonaws.com/master.yaml',description: 'Enter the S3 URL')
         string(name: 'SONAR_PROJECT_NAME',defaultValue: 'Demo' ,description: 'Enter the Sonar Project Name')
         string(name: 'MailToRecipients' ,description: 'Enter the Mail To Recipients')
