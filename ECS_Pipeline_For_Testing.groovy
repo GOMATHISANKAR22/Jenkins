@@ -177,11 +177,11 @@ pipeline {
                  }
              }
          }
-         stage('Send Approval Email for Production') {
+         stage('Final OWASP Report') {
             steps {
                 emailext (
-                    subject: "Approval Needed to Production Environment",
-                    body: '${FILE,path="report.html"} \n Please Verify the Testing Environment and give approval to Production Environment\n\n${BUILD_URL}input/',
+                    subject: "OWASP Report",
+                    body: '${FILE,path="report.html"} \n Application Successfully Deployed in AWS ECS and Verify the OWASP Report\n\n${BUILD_URL}input/',
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']],
                     from: "nithincloudnative@gmail.com",
@@ -190,5 +190,6 @@ pipeline {
                 )
             }
         }
+
 }
 }
