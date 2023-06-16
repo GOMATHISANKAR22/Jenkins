@@ -1,6 +1,7 @@
 pipeline {
     agent any
-    string(name: 'Git_Hub_URL', description: 'Enter the GitHub URL')
+     parameters {
+        string(name: 'Git_Hub_URL', description: 'Enter the GitHub URL')
         string(name: 'AWS_Account_Id' ,description: 'Enter the AWS Account Id')
         string(name: 'MailToRecipients' ,description: 'Enter the Mail Id for Approval')
         string(name: 'Endpoint_URL' ,description: 'Enter the Endpoint URL for OWASP Analysis')
@@ -225,5 +226,6 @@ pipeline {
                 }
             }
         }
+}
 }
 }
