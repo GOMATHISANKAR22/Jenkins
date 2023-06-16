@@ -14,8 +14,8 @@ pipeline {
         string(name: 'Workspace_name',defaultValue: 'ECS_Pipeline_For_Testing',description: 'Workspace name')      
         string(name: 'AWS_Credentials_Id',defaultValue: 'AWS_Credentials', description: 'AWS Credentials Id')
         string(name: 'Git_Credentials_Id',defaultValue: 'Github_Credentials',description: 'Git Credentials Id')
-        string(name: 'Stack_Name', defaultValue: 'ECS' ,description: 'Stack Name (Default: ECS')
-        string(name: 'SONAR_PROJECT_NAME',defaultValue: 'Demo' ,description: 'Sonar Project Name (Default: Demo')
+        string(name: 'Stack_Name', defaultValue: 'ECS' ,description: 'Stack Name (Default: ECS)')
+        string(name: 'SONAR_PROJECT_NAME',defaultValue: 'Demo' ,description: 'Sonar Project Name (Default: Demo)')
         choice  (choices: ["Baseline", "Full"],
                  description: 'Type of scan that is going to perform inside the container',
                  name: 'SCAN_TYPE')
@@ -25,7 +25,7 @@ pipeline {
     }
     environment {
         ECR_Credentials = 'ecr:${Region_Name}:AWS_Credentials'
-        S3_URL          = 'https://yamlclusterecs.s3.amazonaws.com/master.yaml'
+        S3_Url          = 'https://yamlclusterecs.s3.amazonaws.com/master.yaml'
     }
     stages {
         stage('Clone the Git Repository') {
