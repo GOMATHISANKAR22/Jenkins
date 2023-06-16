@@ -39,13 +39,13 @@ pipeline {
                 '''
             }
         }
-        stage('Wait for SonarQube to Start') {
-            steps {
-                script {
-                    sleep 120 
-                }
-            }
-        }
+      //  stage('Wait for SonarQube to Start') {
+       //     steps {
+       //         script {
+        //            sleep 120 
+        //        }
+        //    }
+    //    }
         stage('SonarQube Analysis') {
             steps {
             script {
@@ -68,7 +68,7 @@ pipeline {
                     body: "SonarQube Analysis Report URL: http://${Jenkins_IP}:9000/dashboard?id=${SONAR_PROJECT_NAME} \n Username: admin /n Password: 12345 \n Please Approve to Build the Docker Image in Testing Environment\n\n${BUILD_URL}input/",
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']],
-                    from: "${fromMailId}",
+                    from: "dummymail",
                     to: "${MailToRecipients}",              
                 )
             }
@@ -196,7 +196,7 @@ pipeline {
                     body: '${FILE,path="report.html"} \n Application Successfully Deployed in AWS ECS and Verify the OWASP Report\n\n${BUILD_URL}input/',
                     mimeType: 'text/html',
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']],
-                    from: "${fromMailId}",
+                    from: "dummymail",
                     to: "${MailToRecipients}",
                     attachLog: true
                 )
