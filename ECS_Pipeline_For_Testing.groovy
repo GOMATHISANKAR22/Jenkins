@@ -115,6 +115,7 @@ pipeline {
              }
             }
         }
+        }
         stage('Deploy the Stack') {
             steps {
                 withCredentials([[
@@ -211,4 +212,4 @@ pipeline {
 
 }
 }
-}
+
