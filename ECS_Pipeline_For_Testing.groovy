@@ -105,14 +105,14 @@ pipeline {
                 script {
                 def DockerfilePath = sh(script: 'find -name Dockerfile', returnStdout: true)
                     DockerfilePath = DockerfilePath.replaceAll('^\\.[\\\\/]', '')
-                script {
-                sh '''
-                docker build . -t ${ECR_Repo_Name} -f /var/lib/jenkins/workspace/${Workspace_name}/${DockerfilePath}  
+            
+                sh """
+                docker build . -t ${ECR_Repo_Name} -f /var/lib/jenkins/workspace/${Workspace_name}/${DockerfilePath} 
                 docker tag ${ECR_Repo_Name}:latest ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
                 docker push ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
                
-                '''
-             }
+                """
+             
             }
         }
             }
