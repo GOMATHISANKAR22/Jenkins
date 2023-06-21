@@ -105,6 +105,7 @@ pipeline {
                 script {
                 def DockerfilePath = sh(script: 'find -name ${Docker_File_Name}', returnStdout: true)
                     DockerfilePath = DockerfilePath.replaceAll('^\\.[\\\\/]', '')
+                    echo("${DockerfilePath}")
             
                 sh """
                 docker build . -t ${ECR_Repo_Name} -f /var/lib/jenkins/workspace/${Workspace_name}/${DockerfilePath} 
