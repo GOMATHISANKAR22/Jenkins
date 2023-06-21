@@ -100,11 +100,12 @@ pipeline {
         }
         stage('Build and Push the Docker Image to ECR Repository') {
             steps {
+            withDockerRegistry(credentialsId: "${ECR_Credentials}", url: 'https://${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
                script {
                     def DockerfilePath = sh(script: 'find -name Dockerfile', returnStdout: true)
                     DockerfilePath = DockerfilePath.replaceAll('^\\.[\\\\/]', '')
-               withDockerRegistry(credentialsId: "${ECR_Credentials}", url: 'https://${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
-            {
+               
+               {
                 sh '''
                 docker build . -t ${ECR_Repo_Name} -f /var/lib/jenkins/workspace/${Workspace_name}/${DockerfilePath}  
                 docker tag ${ECR_Repo_Name}:latest ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
