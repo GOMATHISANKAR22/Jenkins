@@ -5,6 +5,7 @@ pipeline {
         string(name: 'AWS_Account_Id' ,description: 'Enter the AWS Account Id')
         string(name: 'MailToRecipients' ,description: 'Enter the Mail Id for Approval')
         string(name: 'Endpoint_URL' ,description: 'Enter the Endpoint URL for OWASP Analysis')
+        string(name: 'Docker_File_Path' ,description: 'Enter the Path for Dockerfile (Eg:/AWS/DockerFile)')
         string(name: 'Container_Port', defaultValue: '80',description: 'Enter the port number for the Container to expose (Default: 80)')
         choice  (choices: ["us-east-1","us-east-2","us-west-1","us-west-2","ap-south-1","ap-northeast-3","ap-northeast-2","ap-southeast-1","ap-southeast-2","ap-northeast-1","ca-central-1","eu-central-1","eu-west-1","eu-west-2","eu-west-3","eu-north-1","sa-east-1"],
                  description: 'Select your Region Name (eg: us-east-1). To Know your region code refer URL "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions" ',
@@ -102,7 +103,7 @@ pipeline {
                withDockerRegistry(credentialsId: "${ECR_Credentials}", url: 'https://${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
             {
                 sh '''
-                docker build -t ${ECR_Repo_Name} .     
+                docker build -t ${ECR_Repo_Name} /var/lib/jenkins/workspace/${Workspace_name}/${Docker_File_Path}  
                 docker tag ${ECR_Repo_Name}:latest ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
                 docker push ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
                
