@@ -5,16 +5,17 @@ pipeline {
         string(name: 'AWS_Account_Id' ,description: 'Enter the AWS Account Id')
         string(name: 'MailToRecipients' ,description: 'Enter the Mail Id for Approval')
         string(name: 'Endpoint_URL' ,description: 'Enter the Endpoint URL for OWASP Analysis')
+        string(name: 'Container_Port', defaultValue: '80',description: 'Enter the port number for the Container to expose (Default: 80)')
         choice  (choices: ["us-east-1","us-east-2","us-west-1","us-west-2","ap-south-1","ap-northeast-3","ap-northeast-2","ap-southeast-1","ap-southeast-2","ap-northeast-1","ca-central-1","eu-central-1","eu-west-1","eu-west-2","eu-west-3","eu-north-1","sa-east-1"],
                  description: 'Select your Region Name (eg: us-east-1). To Know your region code refer URL "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions" ',
                  name: 'Region_Name')  
         string(name: 'ECR_Repo_Name', defaultValue: 'test',description: 'ECR Repositary (Default: test)') 
         string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image (Default: 1.0)')
-        string(name: 'Workspace_name',defaultValue: 'ECS_Pipeline_For_Testing',description: 'Workspace name')      
+        string(name: 'Workspace_name',defaultValue: 'Jenkins_ECS_Fargate_Pipeline_For_CodeTesting_with_OWASP+SonarQube',description: 'Workspace name')      
         string(name: 'AWS_Credentials_Id',defaultValue: 'AWS_Credentials', description: 'AWS Credentials Id')
         string(name: 'Git_Credentials_Id',defaultValue: 'Github_Credentials',description: 'Git Credentials Id')
         string(name: 'Stack_Name', defaultValue: 'ECS' ,description: 'Stack Name (Default: ECS)')
-        string(name: 'SONAR_PROJECT_NAME',defaultValue: 'Demo' ,description: 'Sonar Project Name (Default: Demo)')
+        string(name: 'SONAR_PROJECT_NAME',defaultValue: 'SonarScannerCheck' ,description: 'Sonar Project Name (Default: SonarScannerCheck)')
         choice  (choices: ["Baseline", "Full"],
                  description: 'Type of scan for OWASP Analysis',
                  name: 'SCAN_TYPE')
@@ -125,13 +126,13 @@ pipeline {
                     if (stackExists == 0) {
                         script {
                             sh '''
-                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} || true
+                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} ParameterKey=ContainerPort,ParameterValue=${Container_Port} || true
                            '''
                         }
                     } else {
                         script {
                             sh '''
-                            aws cloudformation create-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} 
+                            aws cloudformation create-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} ParameterKey=ContainerPort,ParameterValue=${Container_Port}
                             '''
                         }
                     }
