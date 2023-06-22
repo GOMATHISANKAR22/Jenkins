@@ -135,7 +135,16 @@ pipeline {
                     if (stackExists == 0) {
                         script {
                             sh '''
-                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} ParameterKey=ContainerPort,ParameterValue=${Container_Port} || true
+                            aws cloudformation update-stack --stack-name ${Stack_Name} --use-previous-template --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} ParameterKey=ContainerPort,ParameterValue=${Container_Port} 
+                            ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true 
+                            ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true 
+                            ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true
+                            ParameterKey=PublicSubnet1CIDR,UsePreviousValue=true ParameterKey=AvailabilityZone1,UsePreviousValue=true
+                            ParameterKey=PublicSubnet2CIDR,UsePreviousValue=true ParameterKey=AvailabilityZone2,UsePreviousValue=true
+                            ParameterKey=PrivateSubnet1CIDR,UsePreviousValue=true ParameterKey=AvailabilityZone3,UsePreviousValue=true
+                            ParameterKey=PrivateSubnet2CIDR,UsePreviousValue=true ParameterKey=AvailabilityZone4,UsePreviousValue=true
+                            ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true
+                            ParameterKey=ThroughputMode,UsePreviousValue=true 
                            '''
                         }
                     } else {
@@ -215,4 +224,3 @@ pipeline {
 
 }
 }
-
