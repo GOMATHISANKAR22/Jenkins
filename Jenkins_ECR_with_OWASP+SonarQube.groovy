@@ -10,7 +10,7 @@ pipeline {
                  name: 'Region_Name')  
         string(name: 'ECR_Repo_Name', defaultValue: 'ecr_default_repo',description: 'ECR Repositary (Default: ecr_default_repo)') 
         string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image (Default: 1.0)')
-        string(name: 'Workspace_name',defaultValue: 'Jenkins_ECS_Fargate_Pipeline_For_CodeTesting_with_OWASP+SonarQube',description: 'Workspace name')      
+        string(name: 'Workspace_name',defaultValue: 'Jenkins_ECR_with_SonarQube',description: 'Workspace name')      
         string(name: 'AWS_Credentials_Id',defaultValue: 'AWS_Credentials', description: 'AWS Credentials Id')
         string(name: 'Git_Credentials_Id',defaultValue: 'Github_Credentials',description: 'Git Credentials Id')
         string(name: 'SONAR_PROJECT_NAME',defaultValue: 'SonarScannerCheck' ,description: 'Sonar Project Name (Default: SonarScannerCheck)')
