@@ -41,13 +41,13 @@ pipeline {
                 '''
             }
         }
-     stage('Wait for SonarQube to Start') {
-          steps {
-               script {
-                   sleep 120 
-               }
-            }
-        }
+//     stage('Wait for SonarQube to Start') {
+        //  steps {
+        //       script {
+          //         sleep 120 
+          //     }
+          //  }
+       // }
         stage('SonarQube Analysis') {
             steps {
             script {
@@ -130,7 +130,7 @@ pipeline {
                 script {
                     def stackExists = sh(
                         returnStatus: true,
-                        script: 'aws cloudformation describe-stacks --stack-name ${Stack_Name}'
+                        script: 'aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].Parameters' --output json > existing-parameters.json'
                     )
                     if (stackExists == 0) {
                         script {
