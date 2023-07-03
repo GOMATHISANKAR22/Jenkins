@@ -22,7 +22,7 @@ pipeline {
                  name: 'SCAN_TYPE')
 
         booleanParam(name: 'Database', defaultValue: false, description: 'Select the checkbox if you need database')
-        choice(name: 'Aurora_database', choices: ['MySQL', 'PostgreSQL', 'NO'], description: 'Select the database engine for your application' )
+        choice(name: 'Aurora_database', choices: ['MySQL', 'PostgreSQL', 'N/A'], description: 'Select the database engine for your application if you select the database checkbox' )
     }
     environment {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
