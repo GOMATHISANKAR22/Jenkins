@@ -10,7 +10,7 @@ pipeline {
         choice  (choices: ["us-east-1","us-east-2","us-west-1","us-west-2","ap-south-1","ap-northeast-3","ap-northeast-2","ap-southeast-1","ap-southeast-2","ap-northeast-1","ca-central-1","eu-central-1","eu-west-1","eu-west-2","eu-west-3","eu-north-1","sa-east-1"],
                  description: 'Select your Region Name (eg: us-east-1). To Know your region code refer URL "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions" ',
                  name: 'Region_Name')  
-        string(name: 'ECR_Repo_Name', defaultValue: 'test',description: 'ECR Repositary (Default: test)') 
+        string(name: 'ECR_Repo_Name', defaultValue: 'ecr_default_repo',description: 'ECR Repositary (Default: ecr_default_repo)') 
         string(name: 'Version_Number', defaultValue: '1.0', description: 'Enter the Version Number for ECR Image (Default: 1.0)')
         string(name: 'Workspace_name',defaultValue: 'Jenkins_ECS_Fargate_Pipeline_For_CodeTesting_with_OWASP+SonarQube',description: 'Workspace name')      
         string(name: 'AWS_Credentials_Id',defaultValue: 'AWS_Credentials', description: 'AWS Credentials Id')
@@ -20,10 +20,13 @@ pipeline {
         choice  (choices: ["Baseline", "Full"],
                  description: 'Type of scan for OWASP Analysis',
                  name: 'SCAN_TYPE')
+
+        booleanParam(name: 'useDatabase', defaultValue: false, description: 'Select the database option')
+        choice(name: 'database', choices: ['MySQL', 'PostgreSQL', 'Oracle'], description: 'Select the database for the Jenkins pipeline', defaultValue: 'MySQL')
     }
     environment {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
-        S3_Url          = 'https://yamlclusterecs1.s3.amazonaws.com/master.yaml'
+        S3_Url          = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkins.yaml'
     }
     stages {
         stage('Clone the Git Repository') {
@@ -135,7 +138,7 @@ pipeline {
                     if (stackExists == 0) {
                         script {
                             sh '''
-                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} ParameterKey=ContainerPort,ParameterValue=${Container_Port} ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true ParameterKey=PublicSubnet1CIDR,UsePreviousValue=true ParameterKey=AvailabilityZone1,UsePreviousValue=true ParameterKey=PublicSubnet2CIDR,UsePreviousValue=true ParameterKey=AvailabilityZone2,UsePreviousValue=true ParameterKey=PrivateSubnet1CIDR,UsePreviousValue=true ParameterKey=AvailabilityZone3,UsePreviousValue=true ParameterKey=PrivateSubnet2CIDR,UsePreviousValue=true ParameterKey=AvailabilityZone4,UsePreviousValue=true ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true ParameterKey=ThroughputMode,UsePreviousValue=true || true 
+                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} ParameterKey=ContainerPort,ParameterValue=${Container_Port} ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true ParameterKey=PublicSubnetCIDR,UsePreviousValue=true ParameterKey=AvailabilityZone,UsePreviousValue=true ParameterKey=PrivateSubnetCIDR,UsePreviousValue=true ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true ParameterKey=ThroughputMode,UsePreviousValue=true ParameterKey=TaskCpu,UsePreviousValue=true ParameterKey=TaskMemory,UsePreviousValue=true ParameterKey=MaxCapacity,UsePreviousValue=true ParameterKey=EmailId,UsePreviousValue=true ParameterKey=MinCapacity,UsePreviousValue=true ParameterKey=CPUAlarmThreshold,UsePreviousValue=true || true
                            '''
                         }
                     } else {
