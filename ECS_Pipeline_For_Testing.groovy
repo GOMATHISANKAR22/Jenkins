@@ -28,7 +28,7 @@ pipeline {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
         S3_Url          = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkins.yaml'
     }
-     stages {
+    stages {
     //     stage('Clone the Git Repository') {
     //         steps {
     //             git branch: 'main', credentialsId: "${Git_Credentials_Id}", url: "${Git_Hub_URL}"
@@ -150,7 +150,7 @@ pipeline {
             }
         }
     }
-    stage('Wait for Stack Update') {
+    stage('Wait for Stack Update1') {
             steps {
                 withCredentials([[
                 $class: 'AmazonWebServicesCredentialsBinding',
