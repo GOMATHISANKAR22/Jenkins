@@ -22,7 +22,13 @@ pipeline {
                  name: 'SCAN_TYPE')
 
         booleanParam(name: 'useDatabase', defaultValue: false, description: 'Select the database option')
-        choice(name: 'database', choices: ['MySQL', 'PostgreSQL', 'Oracle'], description: 'Select the database for the Jenkins pipeline', visible: {useDatabase})
+        if (useDatabase) {
+       properties([
+        parameters([
+            choice(name: 'database', choices: ['MySQL', 'PostgreSQL', 'Oracle'], description: 'Select the database for the Jenkins pipeline')
+        ])
+    ])
+}
     }
     environment {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
