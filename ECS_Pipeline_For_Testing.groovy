@@ -125,6 +125,12 @@ pipeline {
     
          stage('Build the Database') {
             steps {
+                 withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                credentialsId: "${AWS_Credentials_Id}",
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
+                {
                 script {
                 if (params.Database == true) {
                     switch (params.Database_engine) {
@@ -149,7 +155,7 @@ pipeline {
                 }
             }
         }
-    }
+    }}
     stage('Wait for Stack Update1') {
             steps {
                 withCredentials([[
