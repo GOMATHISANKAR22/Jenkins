@@ -21,14 +21,8 @@ pipeline {
                  description: 'Type of scan for OWASP Analysis',
                  name: 'SCAN_TYPE')
 
-        booleanParam(name: 'useDatabase', defaultValue: false, description: 'Select the database option')
-        if (useDatabase) {
-       properties([
-        parameters([
-            choice(name: 'database', choices: ['MySQL', 'PostgreSQL', 'Oracle'], description: 'Select the database for the Jenkins pipeline')
-        ])
-    ])
-}
+        booleanParam(name: 'Database', defaultValue: false, description: 'Select the checkbox if you need database')
+        choice(name: 'Aurora_database', choices: ['MySQL', 'PostgreSQL', 'NO'], description: 'Select the database engine for your application' )
     }
     environment {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
