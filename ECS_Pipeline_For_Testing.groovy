@@ -26,7 +26,7 @@ pipeline {
     }
     environment {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
-        S3_Url          = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkins.yaml'
+        S3_Url          = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkinsanddb.yaml'
     }
     stages {
     //     stage('Clone the Git Repository') {
@@ -123,58 +123,58 @@ pipeline {
     //     }
         
     
-         stage('Build the Database') {
-            steps {
-                 withCredentials([[
-                $class: 'AmazonWebServicesCredentialsBinding',
-                credentialsId: "${AWS_Credentials_Id}",
-                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
-                {
-                script {
-                if (params.Database == true) {
-                    switch (params.Database_engine) {
-                        case 'MySQL':
-                            echo 'Using MySQL database...'
-                             sh '''
-                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkinsanddb.yaml --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=UsePreviousValue=true ParameterKey=DBName,ParameterValue=yobiteldb ParameterKey=ContainerPort,ParameterValue=${Container_Port} ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true ParameterKey=PublicSubnetCIDR,UsePreviousValue=true ParameterKey=AvailabilityZone,UsePreviousValue=true ParameterKey=PrivateSubnetCIDR,UsePreviousValue=true ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true ParameterKey=ThroughputMode,UsePreviousValue=true ParameterKey=TaskCpu,UsePreviousValue=true ParameterKey=TaskMemory,UsePreviousValue=true ParameterKey=MaxCapacity,UsePreviousValue=true ParameterKey=EmailId,UsePreviousValue=true ParameterKey=MinCapacity,UsePreviousValue=true ParameterKey=CPUAlarmThreshold,UsePreviousValue=true || true
-                            '''
-                            break
-                        case 'PostgreSQL':
-                            echo 'Using PostgreSQL database...'
+    //      stage('Build the Database') {
+    //         steps {
+    //              withCredentials([[
+    //             $class: 'AmazonWebServicesCredentialsBinding',
+    //             credentialsId: "${AWS_Credentials_Id}",
+    //             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+    //             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
+    //             {
+    //             script {
+    //             if (params.Database == true) {
+    //                 switch (params.Database_engine) {
+    //                     case 'MySQL':
+    //                         echo 'Using MySQL database...'
+    //                          sh '''
+    //                         aws cloudformation update-stack --stack-name ${Stack_Name} --template-url https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkinsanddb.yaml --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=UsePreviousValue=true ParameterKey=DBName,ParameterValue=yobiteldb ParameterKey=ContainerPort,ParameterValue=${Container_Port} ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true ParameterKey=PublicSubnetCIDR,UsePreviousValue=true ParameterKey=AvailabilityZone,UsePreviousValue=true ParameterKey=PrivateSubnetCIDR,UsePreviousValue=true ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true ParameterKey=ThroughputMode,UsePreviousValue=true ParameterKey=TaskCpu,UsePreviousValue=true ParameterKey=TaskMemory,UsePreviousValue=true ParameterKey=MaxCapacity,UsePreviousValue=true ParameterKey=EmailId,UsePreviousValue=true ParameterKey=MinCapacity,UsePreviousValue=true ParameterKey=CPUAlarmThreshold,UsePreviousValue=true || true
+    //                         '''
+    //                         break
+    //                     case 'PostgreSQL':
+    //                         echo 'Using PostgreSQL database...'
                             
-                            break
-                        default:
-                            echo 'Unknown database selected...'
+    //                         break
+    //                     default:
+    //                         echo 'Unknown database selected...'
                             
-                            break
-                    }
-                } else {
-                    echo 'Database option not selected...'
+    //                         break
+    //                 }
+    //             } else {
+    //                 echo 'Database option not selected...'
                     
-                }
-            }
-        }
-    }}
-    stage('Wait for Stack Update1') {
-            steps {
-                withCredentials([[
-                $class: 'AmazonWebServicesCredentialsBinding',
-                credentialsId: "${AWS_Credentials_Id}",
-                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
-                {
-                script {
-                   def stackStatus = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].StackStatus' --output text").trim()
-                    while (stackStatus.contains('UPDATE_IN_PROGRESS')) {
-                        echo "Waiting for the stack ${Stack_Name}  update to complete..."
-                        sleep 30 
-                        stackStatus = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].StackStatus' --output text").trim()
-                    }
-                }
-            }
-        }
-        }
+    //             }
+    //         }
+    //     }
+    // }}
+    // stage('Wait for Stack Update1') {
+    //         steps {
+    //             withCredentials([[
+    //             $class: 'AmazonWebServicesCredentialsBinding',
+    //             credentialsId: "${AWS_Credentials_Id}",
+    //             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+    //             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
+    //             {
+    //             script {
+    //                def stackStatus = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].StackStatus' --output text").trim()
+    //                 while (stackStatus.contains('UPDATE_IN_PROGRESS')) {
+    //                     echo "Waiting for the stack ${Stack_Name}  update to complete..."
+    //                     sleep 30 
+    //                     stackStatus = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].StackStatus' --output text").trim()
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     }
         stage('Deploy the Stack') {
             steps {
                 withCredentials([[
@@ -191,7 +191,7 @@ pipeline {
                     if (stackExists == 0) {
                         script {
                             sh '''
-                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} ParameterKey=ContainerPort,ParameterValue=${Container_Port} ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true ParameterKey=PublicSubnetCIDR,UsePreviousValue=true ParameterKey=AvailabilityZone,UsePreviousValue=true ParameterKey=PrivateSubnetCIDR,UsePreviousValue=true ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true ParameterKey=ThroughputMode,UsePreviousValue=true ParameterKey=TaskCpu,UsePreviousValue=true ParameterKey=TaskMemory,UsePreviousValue=true ParameterKey=MaxCapacity,UsePreviousValue=true ParameterKey=EmailId,UsePreviousValue=true ParameterKey=MinCapacity,UsePreviousValue=true ParameterKey=CPUAlarmThreshold,UsePreviousValue=true || true
+                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=DBName,ParameterValue=yobiteldb ParameterKey=ImageId,ParameterValue=wordpress:latest ParameterKey=ContainerPort,ParameterValue=${Container_Port} ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true ParameterKey=PublicSubnetCIDR,UsePreviousValue=true ParameterKey=AvailabilityZone,UsePreviousValue=true ParameterKey=PrivateSubnetCIDR,UsePreviousValue=true ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true ParameterKey=ThroughputMode,UsePreviousValue=true ParameterKey=TaskCpu,UsePreviousValue=true ParameterKey=TaskMemory,UsePreviousValue=true ParameterKey=MaxCapacity,UsePreviousValue=true ParameterKey=EmailId,UsePreviousValue=true ParameterKey=MinCapacity,UsePreviousValue=true ParameterKey=CPUAlarmThreshold,UsePreviousValue=true || true
                            '''
                         }
                     } else {
