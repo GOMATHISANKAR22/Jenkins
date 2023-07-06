@@ -23,8 +23,8 @@ pipeline {
     }
     environment {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
-        S3_Url_Db       = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkins.yaml'
-        S3_Url          = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatejenkinsdb.yaml'
+        S3_Url          = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkins.yaml'
+        S3_Url_Db       = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatejenkinsdb.yaml'
     }
     stages {
         stage('Clone the Git Repository') {
