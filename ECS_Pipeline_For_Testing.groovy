@@ -42,13 +42,13 @@ pipeline {
                 '''
             }
         }
-     stage('Wait for SonarQube to Start') {
-          steps {
-               script {
-                   sleep 120 
-               }
-            }
-        }
+   //  stage('Wait for SonarQube to Start') {
+  //        steps {
+  //             script {
+    //               sleep 120 
+        //       }
+     //       }
+     //   }
         stage('SonarQube Analysis') {
             steps {
             script {
