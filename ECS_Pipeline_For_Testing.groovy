@@ -20,161 +20,105 @@ pipeline {
         choice  (choices: ["Baseline", "Full"],
                  description: 'Type of scan for OWASP Analysis',
                  name: 'SCAN_TYPE')
-
-        booleanParam(name: 'Database', defaultValue: false, description: 'Select the checkbox if you need database')
-        choice(name: 'Database_engine', choices: ['MySQL', 'PostgreSQL', 'N/A'], description: 'Select the database engine for your application if you select the database checkbox')
     }
     environment {
         ECR_Credentials = "ecr:${Region_Name}:AWS_Credentials"
-        S3_Url          = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkinsanddb.yaml'
+        S3_Url          = 'https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkins.yaml'
     }
     stages {
-    //     stage('Clone the Git Repository') {
-    //         steps {
-    //             git branch: 'main', credentialsId: "${Git_Credentials_Id}", url: "${Git_Hub_URL}"
-    //             }
-    //     }
-    //     stage('Docker start') {
-    //         steps {
-    //             sh '''
-    //             sudo chmod 666 /var/run/docker.sock
-    //             docker start sonarqube
-    //             docker start owasp
-    //             curl ipinfo.io/ip > ip.txt
-    //             '''
-    //         }
-    //     }
-    //  stage('Wait for SonarQube to Start') {
-    //       steps {
-    //            script {
-    //                sleep 120 
-    //            }
-    //         }
-    //     }
-    //     stage('SonarQube Analysis') {
-    //         steps {
-    //         script {
-    //             def scannerHome = tool 'sonarqube'; 
-    //             withSonarQubeEnv('Default')  {
-    //             sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${SONAR_PROJECT_NAME}"
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     stage('Send Sonar Analysis Report and Approval Email for Build Image') {
-    //         steps {
-    //             script {
-    //                 def Jenkins_IP = sh(
-    //                     returnStdout: true,
-    //                     script: 'cat ip.txt'
-    //                 )
-    //             emailext (
-    //                 subject: "Approval Needed to Build Docker Image",
-    //                 body: "SonarQube Analysis Report URL: http://${Jenkins_IP}:9000/dashboard?id=${SONAR_PROJECT_NAME} \n Username: admin /n Password: 12345 \n Please Approve to Build the Docker Image in Testing Environment\n\n${BUILD_URL}input/",
-    //                 mimeType: 'text/html',
-    //                 recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']],
-    //                 from: "dummymail",
-    //                 to: "${MailToRecipients}",              
-    //             )
-    //         }
-    //     }
-    //     }
-    //     stage('Approval-Build Image') {
-    //         steps {
-    //             timeout(time: 30, unit: 'MINUTES') {
-    //                 input message: 'Please approve the build image process by clicking the link provided in the email.', ok: 'Proceed'
-    //             }
-    //         }
-    //     }
-    //     stage('Create a ECR Repository') {
-    //         steps {
-    //             withCredentials([[
-    //             $class: 'AmazonWebServicesCredentialsBinding',
-    //             credentialsId: "${AWS_Credentials_Id}",
-    //             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-    //             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
-    //             {
-    //             sh '''
-    //             aws ecr create-repository --repository-name ${ECR_Repo_Name} --region ${Region_Name} || true
-    //             cd /var/lib/jenkins/workspace/${Workspace_name}
-    //             '''
-    //             }
-    //         }
-    //     }
-    //     stage('Build and Push the Docker Image to ECR Repository') {
-    //         steps {
-    //             withDockerRegistry(credentialsId: "${ECR_Credentials}", url: 'https://${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
-    //           {
-    //             script {
-    //             def DockerfilePath = sh(script: 'find -name ${Docker_File_Name}', returnStdout: true)
-    //                 DockerfilePath = DockerfilePath.replaceAll('^\\.[\\\\/]', '')
-    //                 echo("${DockerfilePath}")
+        stage('Clone the Git Repository') {
+            steps {
+                git branch: 'main', credentialsId: "${Git_Credentials_Id}", url: "${Git_Hub_URL}"
+                }
+        }
+        stage('Docker start') {
+            steps {
+                sh '''
+                sudo chmod 666 /var/run/docker.sock
+                docker start sonarqube
+                docker start owasp
+                curl ipinfo.io/ip > ip.txt
+                '''
+            }
+        }
+     stage('Wait for SonarQube to Start') {
+          steps {
+               script {
+                   sleep 120 
+               }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+            script {
+                def scannerHome = tool 'sonarqube'; 
+                withSonarQubeEnv('Default')  {
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${SONAR_PROJECT_NAME}"
+                    }
+                }
+            }
+        }
+        stage('Send Sonar Analysis Report and Approval Email for Build Image') {
+            steps {
+                script {
+                    def Jenkins_IP = sh(
+                        returnStdout: true,
+                        script: 'cat ip.txt'
+                    )
+                emailext (
+                    subject: "Approval Needed to Build Docker Image",
+                    body: "SonarQube Analysis Report URL: http://${Jenkins_IP}:9000/dashboard?id=${SONAR_PROJECT_NAME} \n Username: admin /n Password: 12345 \n Please Approve to Build the Docker Image in Testing Environment\n\n${BUILD_URL}input/",
+                    mimeType: 'text/html',
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+                    from: "dummymail",
+                    to: "${MailToRecipients}",              
+                )
+            }
+        }
+        }
+        stage('Approval-Build Image') {
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    input message: 'Please approve the build image process by clicking the link provided in the email.', ok: 'Proceed'
+                }
+            }
+        }
+        stage('Create a ECR Repository') {
+            steps {
+                withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                credentialsId: "${AWS_Credentials_Id}",
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
+                {
+                sh '''
+                aws ecr create-repository --repository-name ${ECR_Repo_Name} --region ${Region_Name} || true
+                cd /var/lib/jenkins/workspace/${Workspace_name}
+                '''
+                }
+            }
+        }
+        stage('Build and Push the Docker Image to ECR Repository') {
+            steps {
+                withDockerRegistry(credentialsId: "${ECR_Credentials}", url: 'https://${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com') 
+              {
+                script {
+                def DockerfilePath = sh(script: 'find -name ${Docker_File_Name}', returnStdout: true)
+                    DockerfilePath = DockerfilePath.replaceAll('^\\.[\\\\/]', '')
+                    echo("${DockerfilePath}")
             
-    //             sh """
-    //             docker build . -t ${ECR_Repo_Name} -f /var/lib/jenkins/workspace/${Workspace_name}/${DockerfilePath} 
-    //             docker tag ${ECR_Repo_Name}:latest ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
-    //             docker push ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
+                sh """
+                docker build . -t ${ECR_Repo_Name} -f /var/lib/jenkins/workspace/${Workspace_name}/${DockerfilePath} 
+                docker tag ${ECR_Repo_Name}:latest ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
+                docker push ${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number}
                
-    //             """
+                """
              
-    //         }
-    //     }
-    //         }
-    //     }
+            }
+        }
+            }
+        }
         
-    
-    //      stage('Build the Database') {
-    //         steps {
-    //              withCredentials([[
-    //             $class: 'AmazonWebServicesCredentialsBinding',
-    //             credentialsId: "${AWS_Credentials_Id}",
-    //             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-    //             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
-    //             {
-    //             script {
-    //             if (params.Database == true) {
-    //                 switch (params.Database_engine) {
-    //                     case 'MySQL':
-    //                         echo 'Using MySQL database...'
-    //                          sh '''
-    //                         aws cloudformation update-stack --stack-name ${Stack_Name} --template-url https://cloudformationecsfargatemarketplace.s3.amazonaws.com/mastertemplateforecsfargatewithjenkinsanddb.yaml --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=UsePreviousValue=true ParameterKey=DBName,ParameterValue=yobiteldb ParameterKey=ContainerPort,ParameterValue=${Container_Port} ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true ParameterKey=PublicSubnetCIDR,UsePreviousValue=true ParameterKey=AvailabilityZone,UsePreviousValue=true ParameterKey=PrivateSubnetCIDR,UsePreviousValue=true ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true ParameterKey=ThroughputMode,UsePreviousValue=true ParameterKey=TaskCpu,UsePreviousValue=true ParameterKey=TaskMemory,UsePreviousValue=true ParameterKey=MaxCapacity,UsePreviousValue=true ParameterKey=EmailId,UsePreviousValue=true ParameterKey=MinCapacity,UsePreviousValue=true ParameterKey=CPUAlarmThreshold,UsePreviousValue=true || true
-    //                         '''
-    //                         break
-    //                     case 'PostgreSQL':
-    //                         echo 'Using PostgreSQL database...'
-                            
-    //                         break
-    //                     default:
-    //                         echo 'Unknown database selected...'
-                            
-    //                         break
-    //                 }
-    //             } else {
-    //                 echo 'Database option not selected...'
-                    
-    //             }
-    //         }
-    //     }
-    // }}
-    // stage('Wait for Stack Update1') {
-    //         steps {
-    //             withCredentials([[
-    //             $class: 'AmazonWebServicesCredentialsBinding',
-    //             credentialsId: "${AWS_Credentials_Id}",
-    //             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-    //             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
-    //             {
-    //             script {
-    //                def stackStatus = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].StackStatus' --output text").trim()
-    //                 while (stackStatus.contains('UPDATE_IN_PROGRESS')) {
-    //                     echo "Waiting for the stack ${Stack_Name}  update to complete..."
-    //                     sleep 30 
-    //                     stackStatus = sh(returnStdout: true, script: "aws cloudformation describe-stacks --stack-name ${Stack_Name} --query 'Stacks[0].StackStatus' --output text").trim()
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     }
         stage('Deploy the Stack') {
             steps {
                 withCredentials([[
@@ -191,7 +135,7 @@ pipeline {
                     if (stackExists == 0) {
                         script {
                             sh '''
-                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=DBName,ParameterValue=yobiteldb ParameterKey=ImageId,ParameterValue=wordpress:latest ParameterKey=ContainerPort,ParameterValue=${Container_Port} ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true ParameterKey=PublicSubnetCIDR,UsePreviousValue=true ParameterKey=AvailabilityZone,UsePreviousValue=true ParameterKey=PrivateSubnetCIDR,UsePreviousValue=true ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true ParameterKey=ThroughputMode,UsePreviousValue=true ParameterKey=TaskCpu,UsePreviousValue=true ParameterKey=TaskMemory,UsePreviousValue=true ParameterKey=MaxCapacity,UsePreviousValue=true ParameterKey=EmailId,UsePreviousValue=true ParameterKey=MinCapacity,UsePreviousValue=true ParameterKey=CPUAlarmThreshold,UsePreviousValue=true || true
+                            aws cloudformation update-stack --stack-name ${Stack_Name} --template-url ${S3_Url} --capabilities CAPABILITY_NAMED_IAM  --parameters ParameterKey=ImageId,ParameterValue=${AWS_Account_Id}.dkr.ecr.${Region_Name}.amazonaws.com/${ECR_Repo_Name}:${Version_Number} ParameterKey=ContainerPort,ParameterValue=${Container_Port} ParameterKey=InstanceName,UsePreviousValue=true ParameterKey=KeyName,UsePreviousValue=true ParameterKey=InstanceType,UsePreviousValue=true ParameterKey=VpcCIDR,UsePreviousValue=true ParameterKey=VolumeSize,UsePreviousValue=true ParameterKey=ClusterName,UsePreviousValue=true ParameterKey=PublicSubnetCIDR,UsePreviousValue=true ParameterKey=AvailabilityZone,UsePreviousValue=true ParameterKey=PrivateSubnetCIDR,UsePreviousValue=true ParameterKey=PerformanceMode,UsePreviousValue=true ParameterKey=EfsProvisionedThroughputInMibps,UsePreviousValue=true ParameterKey=ThroughputMode,UsePreviousValue=true ParameterKey=TaskCpu,UsePreviousValue=true ParameterKey=TaskMemory,UsePreviousValue=true ParameterKey=MaxCapacity,UsePreviousValue=true ParameterKey=EmailId,UsePreviousValue=true ParameterKey=MinCapacity,UsePreviousValue=true ParameterKey=CPUAlarmThreshold,UsePreviousValue=true ParameterKey=DBName,UsePreviousValue=true ParameterKey=DBUser,UsePreviousValue=true ParameterKey=DBPassword,UsePreviousValue=true ParameterKey=DBSubnetCIDR,UsePreviousValue=true ParameterKey=DatabaseAZ,UsePreviousValue=true ParameterKey=EnvironmentvariableKey,UsePreviousValue=true  || true
                            '''
                         }
                     } else {
