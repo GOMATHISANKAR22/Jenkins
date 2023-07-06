@@ -29,7 +29,7 @@ pipeline {
     stages {
         stage('Clone the Git Repository') {
             steps {
-                git branch: 'main', credentialsId: "${Git_Credentials_Id}", url: "${Git_Hub_URL}"
+                git branch: 'master', credentialsId: "${Git_Credentials_Id}", url: "${Git_Hub_URL}"
                 }
         }
         stage('Docker start') {
